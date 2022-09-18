@@ -7,10 +7,12 @@ const products = [{ id: 1, name: "laptop", price: 300 }];
 app.use(morgan("dev"));
 app.use(express.json());
 
+// Get Method: All Products
 app.get("/products", (req, res) => {
   res.send(products);
 });
 
+// Post Method: Create Products
 app.post("/products", (req, res) => {
   const newProduct = { ...req.body, id: products.length + 1 };
   products.push(newProduct);
@@ -18,16 +20,48 @@ app.post("/products", (req, res) => {
   res.send(newProduct);
 });
 
-app.put("/products", (req, res) => {
+// Update Method
+app.put("/products/:id", (req, res) => {
+  const productRequested = products.find((item, i) => {
+    if (item.id === +req.params.id) {
+      products[i] = {
+        ...item,
+        ...req.body,
+      };
+      return true;
+    }
+    return false;
+  });
+
+  if (!productRequested)
+    return res.status(404).json({
+      message: "Product not found.",
+    });
+  7;
+
   res.send("Updating product");
 });
 
-app.delete("/products", (req, res) => {
-  res.send("Deleting product");
+// Delete Method
+app.delete("/products/:id", (req, res) => {
+  const productRequested = products.find((item, i) => {
+    if (item.id === +req.params.id) {
+      products.splice(i, 1);
+      return true;
+    }
+    return false;
+  });
+
+  if (!productRequested)
+    return res.status(404).json({
+      message: "Product not found.",
+    });
+
+  res.send(products);
 });
 
+// Get Method: For single product
 app.get("/products/:id", (req, res) => {
-  console.log(req.params.id);
   const productRequested = products.find((item) => item.id === +req.params.id);
 
   if (!productRequested)
@@ -35,7 +69,6 @@ app.get("/products/:id", (req, res) => {
       message: "Product not found.",
     });
 
-  console.log(productRequested);
   res.json(productRequested);
 });
 
